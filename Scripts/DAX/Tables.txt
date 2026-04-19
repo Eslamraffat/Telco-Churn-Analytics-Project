@@ -1,0 +1,25 @@
+1. RiskSegments = 
+DATATABLE(
+    "Segment", STRING,
+    {
+        {"Month-to-Month"},
+        {"Fiber Optic"},
+        {"0-6 Months"},
+        {"No OnlineSecurity"},
+        {"No TechSupport"}
+    }
+)
+-----------------------
+2. PriorityMatrix = 
+DATATABLE(
+    "Action", STRING,
+    "Impact", DOUBLE,
+    "Effort", DOUBLE,
+    {
+        {"Upgrade Month-to-Month Customers", 10, 3},
+        {"Improve New Customer Onboarding", 9, 4},
+        {"Bundle OnlineSecurity & TechSupport", 8, 2},
+        {"Fix Fiber Optic Service Issues", 9, 8},
+        {"Streaming Services Improvements", 3, 2}
+    }
+)

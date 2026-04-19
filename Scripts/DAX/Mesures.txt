@@ -1,0 +1,116 @@
+1. APEU (Average Per Existing User)
+ARPU = DIVIDE([monthly_revenue],[Customer_Count])
+
+----------------------------------
+
+2. AVG Monthly Charges
+Avg Monthly Charges = AVERAGE('gold fact_billing'[MonthlyCharges])
+
+----------------------------------
+
+3. AVG Tenure
+Avg Tenure = AVERAGE('gold dim_customer'[tenure])
+
+----------------------------------
+
+4. AVG Monthly Charges (Churned)
+Avg_Mon_Charges_Churned = 
+CALCULATE(
+    AVERAGE('gold fact_billing'[MonthlyCharges]),
+    'gold dim_customer'[Churn] = "Yes")
+
+----------------------------------
+
+5. Churn Rate
+Churn_Rate = DIVIDE(CALCULATE([Customer_Count],'gold dim_customer'[Churn]= "yes"),[Customer_Count])
+
+----------------------------------
+
+6. Churned Customers
+Churned Customers = 
+CALCULATE(
+    COUNTROWS('gold dim_customer'),'gold dim_customer'[Churn]="yes")
+
+----------------------------------
+
+7. Customer Count
+Customer_Count = DISTINCTCOUNT('gold dim_contract'[customerID])
+
+----------------------------------
+
+8. Life Time Value (Churned Customers)
+LTV Churn customer = 
+VAR AvgTenureYears =
+    CALCULATE(
+        AVERAGE('gold dim_customer'[tenure]),
+        'gold dim_customer'[Churn] = "Yes"
+    ) / 12
+RETURN
+    CALCULATE(
+        AVERAGE('gold fact_billing'[MonthlyCharges]),
+        'gold dim_customer'[Churn] = "Yes"
+    ) * 12 * AvgTenureYears
+
+----------------------------------
+
+9. Monthly Revenue
+monthly_revenue = SUM('gold fact_billing'[MonthlyCharges])
+
+----------------------------------
+10. Revenue Lost (Churned Customers)
+Revenue Lost = 
+CALCULATE(
+    SUM('gold fact_billing'[MonthlyCharges]),
+    'gold dim_customer'[Churn] = "Yes")
+
+----------------------------------
+
+11. Total Revenue
+Total_revenue = SUM('gold fact_billing'[TotalCharges])
+
+----------------------------------
+
+12. Churn Rate (Segment)
+Churn Rate (Segment) = 
+VAR SelectedSegment = SELECTEDVALUE(RiskSegments[Segment])
+RETURN
+SWITCH(
+    SelectedSegment,
+    "Month-to-Month",
+        CALCULATE(Mesures_table[Churn_Rate], 'gold dim_contract'[contract_type]= "Month-to-month"),
+
+    "Fiber Optic",
+        CALCULATE(Mesures_table[Churn_Rate], 'gold dim_services'[InternetService]= "Fiber optic"),
+
+    "0-6 Months",
+        CALCULATE(Mesures_table[Churn_Rate], 'gold dim_customer'[Tenure Group]= "0–6 months"),
+
+    "No OnlineSecurity",
+        CALCULATE(Mesures_table[Churn_Rate], 'gold dim_services'[OnlineSecurity]= "No"),
+
+    "No TechSupport",
+        CALCULATE(Mesures_table[Churn_Rate], 'gold dim_services'[TechSupport]= "No")
+)
+----------------------------------
+
+13. Revenue Lost (Segment)
+Revenue Lost (Segment) = 
+VAR SelectedSegment = SELECTEDVALUE(RiskSegments[Segment])
+RETURN
+SWITCH(
+    SelectedSegment,
+    "Month-to-Month",
+        CALCULATE(Mesures_table[Revenue Lost], 'gold dim_contract'[contract_type]= "Month-to-month"),
+
+    "Fiber Optic",
+        CALCULATE(Mesures_table[Revenue Lost], 'gold dim_services'[InternetService]= "Fiber optic"),
+
+    "0-6 Months",
+        CALCULATE(Mesures_table[Revenue Lost], 'gold dim_customer'[Tenure Group]= "0–6 months"),
+
+    "No OnlineSecurity",
+        CALCULATE(Mesures_table[Revenue Lost], 'gold dim_services'[OnlineSecurity]= "No"),
+
+    "No TechSupport",
+        CALCULATE(Mesures_table[Revenue Lost], 'gold dim_services'[TechSupport]= "No")
+)
